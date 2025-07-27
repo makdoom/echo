@@ -4,17 +4,55 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { createFileRoute, useRouterState } from "@tanstack/react-router";
+import { useSignUp } from "@clerk/clerk-react";
+import {
+  createFileRoute,
+  useNavigate,
+  useRouterState,
+} from "@tanstack/react-router";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { Loader } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/(auth)/emailVerification/")({
   component: EmailVerification,
 });
 
 function EmailVerification() {
+  const navigate = useNavigate();
+  const { isLoaded, signUp, setActive } = useSignUp();
+  const [otpValue, setOtpValue] = useState("");
+  const [isVerifying, setisVerifying] = useState(false);
+
   const email = useRouterState({
-    select: (s) => s.location.state?.emailVerification?.email, // Access the formData from state
+    select: (s) => s.location.state?.emailVerification?.email,
   });
+
+  const handleOtpChange = (value: string) => setOtpValue(value);
+
+  const handleEmailVerification = async () => {
+    try {
+      if (!isLoaded || otpValue?.length !== 6) return;
+
+      setisVerifying(true);
+      const completeSignup = await signUp.attemptEmailAddressVerification({
+        code: otpValue,
+      });
+      if (completeSignup.status === "complete") {
+        await setActive({ session: signUp.createdSessionId });
+        navigate({ to: "/chat" });
+      }
+    } catch (error: any) {
+      console.log(JSON.stringify(error, null, 2));
+      toast.error(
+        error.errors[0]?.message ||
+          "Something went wrong while email verification"
+      );
+    } finally {
+      setisVerifying(false);
+    }
+  };
 
   return (
     <div className="h-screen w-screen flex justify-center items-center flex-col space-y-10">
@@ -28,7 +66,14 @@ function EmailVerification() {
       </div>
 
       <div className="w-full max-w-80 space-y-8 flex flex-col items-center justify-center">
-        <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS} autoFocus>
+        <InputOTP
+          maxLength={6}
+          pattern={REGEXP_ONLY_DIGITS}
+          value={otpValue}
+          disabled={isVerifying}
+          onChange={handleOtpChange} // Attach the change handler
+          autoFocus
+        >
           <InputOTPGroup className="space-x-2">
             <InputOTPSlot index={0} />
             <InputOTPSlot index={1} />
@@ -39,7 +84,13 @@ function EmailVerification() {
           </InputOTPGroup>
         </InputOTP>
 
-        <Button className="w-full">Verify</Button>
+        <Button
+          className="w-full py-5"
+          onClick={handleEmailVerification}
+          disabled={isVerifying}
+        >
+          Verify {isVerifying && <Loader className="animate animate-spin" />}
+        </Button>
       </div>
     </div>
   );

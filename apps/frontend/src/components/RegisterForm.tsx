@@ -13,10 +13,14 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useSignUp } from "@clerk/clerk-react";
+import { toast } from "sonner";
+import { Loader } from "lucide-react";
+import { useState } from "react";
 
 const RegisterForm = () => {
-  const { isLoaded } = useSignUp();
+  const { isLoaded, signUp } = useSignUp();
   const navigate = useNavigate();
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const form = useForm<authTypes.RegisterSchemaType>({
     resolver: zodResolver(authTypes.RegisterSchema),
@@ -27,12 +31,29 @@ const RegisterForm = () => {
     },
   });
 
-  const onSubmit = (data: authTypes.LoginSchemaType) => {
-    console.log(data);
-    navigate({
-      to: "/emailVerification",
-      state: { emailVerification: { email: data.email } },
-    });
+  const onSubmit = async (data: authTypes.RegisterSchemaType) => {
+    if (!isLoaded) return;
+
+    try {
+      setIsRegistering(true);
+      await signUp?.create({
+        emailAddress: data.email,
+        password: data.password,
+      });
+      await signUp?.prepareEmailAddressVerification({ strategy: "email_code" });
+      navigate({
+        to: "/emailVerification",
+        state: { emailVerification: { email: data.email } },
+      });
+    } catch (error: any) {
+      console.log(JSON.stringify(error, null, 2));
+      toast.error(
+        error?.errors[0]?.message ||
+          "Something went wrong while registering the user"
+      );
+    } finally {
+      setIsRegistering(false);
+    }
   };
 
   if (!isLoaded) return null;
@@ -43,6 +64,7 @@ const RegisterForm = () => {
         <FormField
           control={form.control}
           name="fullname"
+          disabled={isRegistering}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
@@ -57,6 +79,7 @@ const RegisterForm = () => {
         <FormField
           control={form.control}
           name="email"
+          disabled={isRegistering}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
@@ -72,6 +95,7 @@ const RegisterForm = () => {
         <FormField
           control={form.control}
           name="password"
+          disabled={isRegistering}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Password</FormLabel>
@@ -83,8 +107,9 @@ const RegisterForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full py-5">
+        <Button type="submit" className="w-full py-5" disabled={isRegistering}>
           Register
+          {isRegistering && <Loader className="animate animate-spin" />}
         </Button>
       </form>
 

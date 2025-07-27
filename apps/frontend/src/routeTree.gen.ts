@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ChatIndexRouteImport } from './routes/chat/index'
 import { Route as landingIndexRouteImport } from './routes/(landing)/index'
 import { Route as authRegisterIndexRouteImport } from './routes/(auth)/register/index'
 import { Route as authLoginIndexRouteImport } from './routes/(auth)/login/index'
 import { Route as authEmailVerificationIndexRouteImport } from './routes/(auth)/emailVerification/index'
 
+const ChatIndexRoute = ChatIndexRouteImport.update({
+  id: '/chat/',
+  path: '/chat/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const landingIndexRoute = landingIndexRouteImport.update({
   id: '/(landing)/',
   path: '/',
@@ -38,12 +44,14 @@ const authEmailVerificationIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof landingIndexRoute
+  '/chat': typeof ChatIndexRoute
   '/emailVerification': typeof authEmailVerificationIndexRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof landingIndexRoute
+  '/chat': typeof ChatIndexRoute
   '/emailVerification': typeof authEmailVerificationIndexRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
@@ -51,18 +59,20 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(landing)/': typeof landingIndexRoute
+  '/chat/': typeof ChatIndexRoute
   '/(auth)/emailVerification/': typeof authEmailVerificationIndexRoute
   '/(auth)/login/': typeof authLoginIndexRoute
   '/(auth)/register/': typeof authRegisterIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/emailVerification' | '/login' | '/register'
+  fullPaths: '/' | '/chat' | '/emailVerification' | '/login' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/emailVerification' | '/login' | '/register'
+  to: '/' | '/chat' | '/emailVerification' | '/login' | '/register'
   id:
     | '__root__'
     | '/(landing)/'
+    | '/chat/'
     | '/(auth)/emailVerification/'
     | '/(auth)/login/'
     | '/(auth)/register/'
@@ -70,6 +80,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   landingIndexRoute: typeof landingIndexRoute
+  ChatIndexRoute: typeof ChatIndexRoute
   authEmailVerificationIndexRoute: typeof authEmailVerificationIndexRoute
   authLoginIndexRoute: typeof authLoginIndexRoute
   authRegisterIndexRoute: typeof authRegisterIndexRoute
@@ -77,6 +88,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/chat/': {
+      id: '/chat/'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(landing)/': {
       id: '/(landing)/'
       path: '/'
@@ -110,6 +128,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   landingIndexRoute: landingIndexRoute,
+  ChatIndexRoute: ChatIndexRoute,
   authEmailVerificationIndexRoute: authEmailVerificationIndexRoute,
   authLoginIndexRoute: authLoginIndexRoute,
   authRegisterIndexRoute: authRegisterIndexRoute,
