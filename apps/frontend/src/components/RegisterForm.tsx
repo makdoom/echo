@@ -11,9 +11,13 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useSignUp } from "@clerk/clerk-react";
 
 const RegisterForm = () => {
+  const { isLoaded } = useSignUp();
+  const navigate = useNavigate();
+
   const form = useForm<authTypes.RegisterSchemaType>({
     resolver: zodResolver(authTypes.RegisterSchema),
     defaultValues: {
@@ -23,7 +27,15 @@ const RegisterForm = () => {
     },
   });
 
-  const onSubmit = () => {};
+  const onSubmit = (data: authTypes.LoginSchemaType) => {
+    console.log(data);
+    navigate({
+      to: "/emailVerification",
+      state: { emailVerification: { email: data.email } },
+    });
+  };
+
+  if (!isLoaded) return null;
 
   return (
     <Form {...form}>

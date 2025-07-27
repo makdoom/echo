@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as landingIndexRouteImport } from './routes/(landing)/index'
 import { Route as authRegisterIndexRouteImport } from './routes/(auth)/register/index'
 import { Route as authLoginIndexRouteImport } from './routes/(auth)/login/index'
+import { Route as authEmailVerificationIndexRouteImport } from './routes/(auth)/emailVerification/index'
 
 const landingIndexRoute = landingIndexRouteImport.update({
   id: '/(landing)/',
@@ -28,33 +29,48 @@ const authLoginIndexRoute = authLoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const authEmailVerificationIndexRoute =
+  authEmailVerificationIndexRouteImport.update({
+    id: '/(auth)/emailVerification/',
+    path: '/emailVerification/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof landingIndexRoute
+  '/emailVerification': typeof authEmailVerificationIndexRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof landingIndexRoute
+  '/emailVerification': typeof authEmailVerificationIndexRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(landing)/': typeof landingIndexRoute
+  '/(auth)/emailVerification/': typeof authEmailVerificationIndexRoute
   '/(auth)/login/': typeof authLoginIndexRoute
   '/(auth)/register/': typeof authRegisterIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register'
+  fullPaths: '/' | '/emailVerification' | '/login' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register'
-  id: '__root__' | '/(landing)/' | '/(auth)/login/' | '/(auth)/register/'
+  to: '/' | '/emailVerification' | '/login' | '/register'
+  id:
+    | '__root__'
+    | '/(landing)/'
+    | '/(auth)/emailVerification/'
+    | '/(auth)/login/'
+    | '/(auth)/register/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   landingIndexRoute: typeof landingIndexRoute
+  authEmailVerificationIndexRoute: typeof authEmailVerificationIndexRoute
   authLoginIndexRoute: typeof authLoginIndexRoute
   authRegisterIndexRoute: typeof authRegisterIndexRoute
 }
@@ -82,11 +98,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authLoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(auth)/emailVerification/': {
+      id: '/(auth)/emailVerification/'
+      path: '/emailVerification'
+      fullPath: '/emailVerification'
+      preLoaderRoute: typeof authEmailVerificationIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   landingIndexRoute: landingIndexRoute,
+  authEmailVerificationIndexRoute: authEmailVerificationIndexRoute,
   authLoginIndexRoute: authLoginIndexRoute,
   authRegisterIndexRoute: authRegisterIndexRoute,
 }
