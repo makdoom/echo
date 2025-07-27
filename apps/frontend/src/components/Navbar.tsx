@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
 
 const Navbar = () => {
@@ -9,7 +10,9 @@ const Navbar = () => {
         </h2>
       </div>
 
-      <Button size="sm">Login</Button>
+      <Button size="sm">
+        <Link to="/login">Login</Link>
+      </Button>
     </div>
   );
 };
