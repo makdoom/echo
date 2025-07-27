@@ -7,6 +7,7 @@ import {
 import { useSignUp } from "@clerk/clerk-react";
 import {
   createFileRoute,
+  redirect,
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
@@ -16,6 +17,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/(auth)/emailVerification/")({
+  beforeLoad: (ctx) => {
+    const email = ctx.location.state.emailVerification?.email;
+    if (!email) throw redirect({ to: "/register" });
+  },
   component: EmailVerification,
 });
 

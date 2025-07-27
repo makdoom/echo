@@ -1,8 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { useAuth, useUser } from "@clerk/clerk-react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/chat/")({
+  beforeLoad: async (ctx) => {
+    const token = await ctx.context.auth?.getToken();
+    console.log({ token });
+    if (!token) throw redirect({ to: "/login" });
+  },
   component: Chat,
 });
 

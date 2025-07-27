@@ -36,7 +36,13 @@ const RegisterForm = () => {
 
     try {
       setIsRegistering(true);
+      const splited = data.fullname?.split(" ");
+      const firstName = splited[0];
+      const lastName = splited[splited.length - 1];
+
       await signUp?.create({
+        firstName,
+        lastName,
         emailAddress: data.email,
         password: data.password,
       });
