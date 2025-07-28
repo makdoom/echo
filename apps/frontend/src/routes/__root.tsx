@@ -8,7 +8,7 @@ export interface RootRouteContext {
 
 export const Route = createRootRouteWithContext<RootRouteContext>()({
   component: () => (
-    <div className="h-screen w-screen bg-foreground text-secondary">
+    <div className="h-screen w-screen bg-foreground text-muted">
       <Outlet />
       <TanStackRouterDevtools />
     </div>
