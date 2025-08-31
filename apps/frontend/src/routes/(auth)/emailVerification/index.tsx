@@ -17,9 +17,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/(auth)/emailVerification/")({
-  beforeLoad: (ctx) => {
-    const email = ctx.location.state.emailVerification?.email;
-    if (!email) throw redirect({ to: "/register" });
+  beforeLoad: async (ctx) => {
+    const token = await ctx.context.auth?.getToken();
+    console.log({ token });
+    if (token) throw redirect({ to: "/chat" });
   },
   component: EmailVerification,
 });

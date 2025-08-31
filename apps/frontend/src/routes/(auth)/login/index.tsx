@@ -1,7 +1,12 @@
 import LoginForm from "@/components/LoginForm";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(auth)/login/")({
+  beforeLoad: async (ctx) => {
+    const token = await ctx.context.auth?.getToken();
+    console.log({ token });
+    if (token) throw redirect({ to: "/chat" });
+  },
   component: Login,
 });
 
