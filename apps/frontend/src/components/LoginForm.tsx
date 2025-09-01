@@ -16,11 +16,14 @@ import { useSignIn } from "@clerk/clerk-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Loader } from "lucide-react";
+import { useApi } from "@/hooks/useApi";
 
 const LoginForm = () => {
+  const api = useApi();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const { isLoaded, signIn, setActive } = useSignIn();
   const navigate = useNavigate();
+
   const form = useForm<authTypes.LoginSchemaType>({
     resolver: zodResolver(authTypes.LoginSchema),
     defaultValues: {
@@ -40,7 +43,10 @@ const LoginForm = () => {
       });
       if (result.status == "complete") {
         await setActive({ session: result.createdSessionId });
-        navigate({ to: "/chat" });
+
+        const response = await api.post("/auth/login");
+        console.log(response);
+        // navigate({ to: "/chat" });
       } else {
         toast.error(
           "Login failed, Please check your credentials and try again"
