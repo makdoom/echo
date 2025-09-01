@@ -9,18 +9,23 @@
     "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --external:express --external:cors",
     "start": "node dist/index.js",
     "lint": "eslint . --max-warnings 0",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@clerk/express": "^1.7.13",
+    "@neondatabase/serverless": "^1.0.1",
     "@prisma/client": "^6.13.0",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
+    "drizzle-orm": "^0.44.5",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "prisma": "^6.13.0",
@@ -36,6 +41,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/node": "^24.0.14",
+    "drizzle-kit": "^0.31.4",
     "esbuild": "^0.25.6",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

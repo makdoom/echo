@@ -1,3 +1,5 @@
+import db from "@/db";
+import { users } from "@/db/schema";
 import { WebhookEvent } from "@clerk/express";
 import { Request, Response } from "express";
 import { Webhook, WebhookRequiredHeaders } from "svix";
@@ -39,10 +41,17 @@ export const userCreatedWebhook = async (req: Request, res: Response) => {
 
     // Process the event based on its type
     if (event.type == "user.created") {
-      console.log("New user created", event.data);
+      const { id, first_name, last_name, image_url, email_addresses } =
+        event.data;
+      await db.insert(users).values({
+        userId: id,
+        name: `${first_name || ""} ${last_name || ""}`.trim(),
+        email: email_addresses[0]?.email_address || "",
+        imageURL: image_url,
+      });
     }
 
-    return res.status(200).json({ messgae: "Webhook recieved successflly" });
+    return res.status(200).json({ message: "New user created" });
   } catch (error) {
     console.log(error);
     throw error;
