@@ -16,10 +16,11 @@ import { useSignIn } from "@clerk/clerk-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Loader } from "lucide-react";
-import { useApi } from "@/hooks/useApi";
+import { useRequest } from "@/hooks/useApi";
+import type { LoginData } from "@repo/types/src/authTypes";
 
 const LoginForm = () => {
-  const api = useApi();
+  const { post } = useRequest();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const { isLoaded, signIn, setActive } = useSignIn();
   const navigate = useNavigate();
@@ -44,20 +45,43 @@ const LoginForm = () => {
       if (result.status == "complete") {
         await setActive({ session: result.createdSessionId });
 
-        const response = await api.post("/auth/login");
-        console.log(response);
-        // navigate({ to: "/chat" });
+        const responseData = await post<LoginData>("/auth/login");
+
+        if (responseData.success) {
+          console.log("Login successful:", responseData);
+          // responseData.data is now properly typed as LoginData
+          navigate({ to: "/chat" });
+        } else {
+          console.error("Login failed:", responseData.message);
+          toast.error(
+            responseData.message ||
+              "An unexpected error occurred. Please try again."
+          );
+        }
       } else {
         toast.error(
           "Login failed, Please check your credentials and try again"
         );
       }
     } catch (error: any) {
-      console.log(JSON.stringify(error, null, 2));
-      toast.error(
-        error.errors[0]?.message ||
-          "An unexpected error occurred. Please try again."
-      );
+      console.error("Login error:", error);
+
+      // Handle different types of errors
+      let errorMessage = "An unexpected error occurred. Please try again.";
+
+      if (
+        error.errors &&
+        Array.isArray(error.errors) &&
+        error.errors[0]?.message
+      ) {
+        // Clerk authentication errors
+        errorMessage = error.errors[0].message;
+      } else if (error.message) {
+        // API response errors or other errors with message property
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsAuthenticating(false);
     }

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError, type AxiosResponse } from "axios";
 
 const api = axios.create({
   baseURL:
@@ -8,10 +8,11 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Response interceptor (always return only data)
 api.interceptors.response.use(
-  (res) => res.data,
-  (error) => {
+  <T>(res: AxiosResponse<T>) => {
+    return res;
+  },
+  (error: AxiosError) => {
     if (error.response?.status === 401) {
       console.warn("Unauthorized — maybe token expired.");
     }

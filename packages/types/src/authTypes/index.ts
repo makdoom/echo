@@ -14,3 +14,8 @@ export const RegisterSchema = z.object({
 });
 
 export type RegisterSchemaType = z.infer<typeof RegisterSchema>;
+
+export type LoginData = {
+  userId: string;
+  sessionId: string;
+};
